@@ -3,7 +3,7 @@ Unit Tests for the TwixtBoard class
 """
 import unittest
 
-from twixt.TwixtBoard import TwixtBoard
+from TwixtBoard import TwixtBoard
 
 RED = 1
 BLACK = -1
@@ -17,19 +17,19 @@ class TestTwixtBoard(unittest.TestCase):
     def setUp(self):
         pass
 
-    def testHasLegalMoves(self):
+    def test_has_legal_moves(self):
         board = TwixtBoard(SMALL_BOARD_SIZE)
         self.assertTrue(board.has_legal_moves())
 
-    def testGetLegalMoves(self):
+    def test_get_legal_moves(self):
         board = TwixtBoard(SMALL_BOARD_SIZE)
         legal_moves = board.get_legal_moves(RED)
-        self.assertEquals(SMALL_BOARD_TOTAL_LEGAL_MOVES, len(legal_moves))
+        self.assertEqual(SMALL_BOARD_TOTAL_LEGAL_MOVES, len(legal_moves))
 
         center_move = (3, 4)
         board.execute_move(center_move, RED)
         legal_moves = board.get_legal_moves(BLACK)
-        self.assertEquals(SMALL_BOARD_TOTAL_LEGAL_MOVES-1, len(legal_moves))
+        self.assertEqual(SMALL_BOARD_TOTAL_LEGAL_MOVES-1, len(legal_moves))
 
         board = TwixtBoard(SMALL_BOARD_SIZE)
         current_player = RED
@@ -39,7 +39,7 @@ class TestTwixtBoard(unittest.TestCase):
                 board.execute_move(move, current_player)
                 current_player *= -1
         legal_moves = board.get_legal_moves(current_player)
-        self.assertEquals(0, len(legal_moves))
+        self.assertEqual(0, len(legal_moves))
 
 
 if __name__ == '__main__':
