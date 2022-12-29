@@ -1,3 +1,6 @@
+"""
+Unit Tests for the TwixtGame class
+"""
 import unittest
 
 from twixt.TwixtGame import TwixtGame
