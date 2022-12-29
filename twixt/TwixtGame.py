@@ -14,10 +14,10 @@ class TwixtGame(Game):
         self.n = n
 
     def getInitBoard(self):
-        return None
+        return True
 
     def getBoardSize(self):
-        return None
+        return self.n
 
     def getActionSize(self):
         return None
