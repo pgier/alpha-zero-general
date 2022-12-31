@@ -42,5 +42,13 @@ class TestTwixtBoard(unittest.TestCase):
         self.assertEqual(0, len(legal_moves))
 
 
+    def test_twixt_links1(self):
+        board = TwixtBoard(SMALL_BOARD_SIZE)
+        move_1 = (3, 4)
+        move_2 = (1, 3)
+        board.execute_move(move_1, RED)
+        board.execute_move(move_2, RED)
+        print(board.check_links(move_2, RED))
+
 if __name__ == '__main__':
     unittest.main()
