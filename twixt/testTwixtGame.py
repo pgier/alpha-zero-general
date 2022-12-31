@@ -3,7 +3,7 @@ Unit Tests for the TwixtGame class
 """
 import unittest
 
-from TwixtGame import TwixtGame
+from twixt.TwixtGame import TwixtGame
 
 TEST_BOARD_SIZE = 12
 

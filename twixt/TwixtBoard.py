@@ -4,16 +4,19 @@ Board class for the game of Twixt.
 '''
 import logging
 from logging import *
-class TwixtBoard():
-    BLACK = -1
-    RED = 1
-    GETALL = 2
+
+BLACK = -1
+RED = 1
+
+
+class TwixtBoard:
+    GET_ALL = 2
+
     def __init__(self, n=3):
         self.n = n
         self.pegs = [0] * self.n * self.n
-        self.linksRED = dict()
-        self.linksBLACK = {}
-        return None
+        self.links_red = dict()
+        self.links_black = dict()
 
     # add [][] indexer syntax to the Board
     def __getitem__(self, index):
@@ -44,39 +47,39 @@ class TwixtBoard():
             pos = position
         return pos
 
-    def get_links(self, position, color=GETALL):
+    def get_links(self, position, color=GET_ALL):
         pos = self.get_num(position)
-        if color == self.RED:
-            return self.linksRED[pos]
-        elif color == self.BLACK:
-            return self.linksBLACK[pos]
+        if color == RED:
+            return self.links_red[pos]
+        elif color == BLACK:
+            return self.links_black[pos]
         else:
-            if pos in self.linksRED:
-                return self.linksRED[pos]
-            elif pos in self.linksBLACK:
-                return self.linksBLACK[pos]
+            if pos in self.links_red:
+                return self.links_red[pos]
+            elif pos in self.links_black:
+                return self.links_black[pos]
             else:
                 return None
 
     def connect_link(self, position1, position2, color):
-        if color == self.BLACK:
-            if position1 not in self.linksBLACK:
-                self.linksBLACK[position1] = set()
+        if color == BLACK:
+            if position1 not in self.links_black:
+                self.links_black[position1] = set()
 
-            if position2 not in self.linksBLACK:
-                self.linksBLACK[position2] = set()
+            if position2 not in self.links_black:
+                self.links_black[position2] = set()
 
-            self.linksBLACK[position1].add(position2)
-            self.linksBLACK[position2].add(position1)
-        if color == self.RED:
-            if position1 not in self.linksRED:
-                self.linksRED[position1] = set()
+            self.links_black[position1].add(position2)
+            self.links_black[position2].add(position1)
+        if color == RED:
+            if position1 not in self.links_red:
+                self.links_red[position1] = set()
 
-            if position2 not in self.linksRED:
-                self.linksRED[position2] = set()
-            self.linksRED[position1]
-            self.linksRED[position1].add(position2)
-            self.linksRED[position2].add(position1)
+            if position2 not in self.links_red:
+                self.links_red[position2] = set()
+            self.links_red[position1]
+            self.links_red[position1].add(position2)
+            self.links_red[position2].add(position1)
 
     def check_links(self, position, color):
         pos = self.get_num(position)
@@ -130,7 +133,7 @@ class TwixtBoard():
                     log(DEBUG, "connection S by SW")
                     self.connect_link(pos, pos - 1 + self.n + self.n, color)
 
-        return len(self.linksRED), len(self.linksBLACK)
+        return len(self.links_red), len(self.links_black)
 
     def has_legal_moves(self):
         for i in range(len(self.pegs)):
@@ -139,7 +142,7 @@ class TwixtBoard():
         return False
 
     def is_win(self, color):
-        return None
+        return False
 
     def execute_move(self, move, color):
         (x, y) = move
