@@ -3,7 +3,7 @@ Unit Tests for the TwixtBoard class
 """
 import unittest
 
-from TwixtBoard import TwixtBoard
+from twixt.TwixtBoard import TwixtBoard
 
 RED = 1
 BLACK = -1
@@ -41,14 +41,18 @@ class TestTwixtBoard(unittest.TestCase):
         legal_moves = board.get_legal_moves(current_player)
         self.assertEqual(0, len(legal_moves))
 
-
     def test_twixt_links1(self):
         board = TwixtBoard(SMALL_BOARD_SIZE)
-        move_1 = (3, 4)
-        move_2 = (1, 3)
+        move_1 = (1, 1)
         board.execute_move(move_1, RED)
+        move_2 = (2, 3)
         board.execute_move(move_2, RED)
-        print(board.check_links(move_2, RED))
+        move_3 = (3, 5)
+        board.execute_move(move_3, RED)
+
+        self.assertEqual(3, len(board.linksRED))
+        self.assertTrue((2, 3) in board.linksRED[move_1])
+
 
 if __name__ == '__main__':
     unittest.main()
