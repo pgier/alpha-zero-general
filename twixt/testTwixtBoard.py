@@ -49,9 +49,17 @@ class TestTwixtBoard(unittest.TestCase):
         board.execute_move(move_2, RED)
         move_3 = (3, 5)
         board.execute_move(move_3, RED)
-
+        move_4 = (1, 2)
+        board.execute_move(move_4, BLACK)
+        move_5 = (3, 3)
+        board.execute_move(move_5, BLACK)
         self.assertEqual(3, len(board.linksRED))
-        self.assertTrue((2, 3) in board.linksRED[move_1])
+        self.assertTrue(board.get_num(move_2) in board.get_links(move_1))
+        self.assertTrue(board.get_num(move_3) in board.get_links(move_2))
+        self.assertTrue(board.get_num(move_1) in board.get_links(move_2))
+        self.assertFalse(board.get_num(move_3) in board.get_links(move_1))
+        self.assertFalse(board.get_num(move_4) in board.get_links(move_5), "expected block by red")
+
 
 
 if __name__ == '__main__':
