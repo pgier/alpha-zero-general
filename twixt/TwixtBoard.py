@@ -50,13 +50,20 @@ class TwixtBoard:
 
     def get_legal_moves(self, color):
         moves = list()
-        for i in range(len(self.pegs)):
-            if self.pegs[i] == 0:
-                new_move = (i % self.n, i // self.n)
-                moves.append(new_move)
+        for i in range(self.x):
+            for j in range(self.y):
+                if self.board[i][j] == 0:
+                    new_move = (i, j)
+                    moves.append(new_move)
         print(moves)
 
         return moves
+    def has_legal_moves(self):
+        for i in range(self.x):
+            for j in range(self.y):
+                if self.board[i][j] == 0:
+                    return True
+        return False
 
     def get_num(self, position):
         if type(position) is tuple:
@@ -161,18 +168,13 @@ class TwixtBoard:
 
         return len(self.links_red), len(self.links_black)
 
-    def has_legal_moves(self):
-        for i in range(len(self.pegs)):
-            if self.pegs[i] == 0:
-                return True
-        return False
+
 
     def is_win(self, color):
         return False
 
     def execute_move(self, move, color):
         (x, y) = move
-        pos = y * self.n + x
-        assert self.pegs[pos] == 0
-        self.pegs[pos] = color
+        assert self.board[x][y] == 0
+        self.board[x][y] = color
         self.check_links(move, color)
