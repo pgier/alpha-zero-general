@@ -3,9 +3,7 @@ Unit Tests for the TwixtBoard class
 """
 import unittest
 
-from twixt.TwixtBoard import TwixtBoard
-from twixt.TwixtBoard import RED
-from twixt.TwixtBoard import BLACK
+from twixt.TwixtBoard import *
 
 
 SMALL_BOARD_SIZE = 6
@@ -16,6 +14,22 @@ class TestTwixtBoard(unittest.TestCase):
 
     def setUp(self):
         pass
+
+    def test_board_index(self):
+        board = TwixtBoard(SMALL_BOARD_SIZE)
+        x = 2
+        y = 3
+        self.assertEqual(EMPTY, board[x][y])
+        move = (x, y)
+        board.execute_move(move, RED)
+        self.assertEqual(RED, board[x][y], "expected red, found {0}".format(color_name[board[x][y]]))
+
+    def test_board_get(self):
+        board = TwixtBoard(SMALL_BOARD_SIZE)
+        move = (2, 3)
+        self.assertEqual(EMPTY, board.get(move))
+        board.execute_move(move, RED)
+        self.assertEqual(RED, board.get(move), "expected red, found {0}".format(color_name[board.get(move)]))
 
     def test_has_legal_moves(self):
         board = TwixtBoard(SMALL_BOARD_SIZE)

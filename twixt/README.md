@@ -1,1 +1,3 @@
-# Twixt implementation for Alpha Zero General
+# TwixT
+
+An implementation of the game [TwixT](https://en.wikipedia.org/wiki/TwixT).

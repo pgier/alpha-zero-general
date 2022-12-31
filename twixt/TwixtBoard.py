@@ -1,26 +1,52 @@
-'''
-Board class for the game of Twixt.
-
-'''
-import logging
+"""
+Board logic for the game of TwixT.
+"""
+import numpy
 from logging import *
 
-BLACK = -1
+EMPTY = 0
 RED = 1
+BLACK = -1
+
+color_name = {
+    EMPTY: "empty",
+    RED: "red",
+    BLACK: "black",
+}
 
 
 class TwixtBoard:
+    """
+    Represents a Twixt board.  Red tries to cross the board top to bottom
+    (y direction) while black tries to cross left to right (x direction).
+    """
     GET_ALL = 2
 
-    def __init__(self, n=3):
-        self.n = n
+    def __init__(self, size=24, handicap=0):
+        """
+        Initialize the board with the given side length (size).  An optional
+        handicap can be provided which gives the red player an advantage by making
+        the up/down (y diretion) size of the board shorter than the width (x direction).
+        """
+        self.n = size
+
+        self.x = size
+        self.y = size - handicap
+        self.board = numpy.zeros((self.x, self.y), numpy.int8)
+
+        # TODO: remove the `pegs` array and replace with the two dimensional `board` array
         self.pegs = [0] * self.n * self.n
         self.links_red = dict()
         self.links_black = dict()
 
     # add [][] indexer syntax to the Board
     def __getitem__(self, index):
-        return self.pegs[index]
+        return self.board[index]
+
+    def get(self, position):
+        """ get the integer value (empty, red, black) at the given (x, y) position """
+        (x, y) = position
+        return self.board[x][y]
 
     def get_legal_moves(self, color):
         moves = list()
