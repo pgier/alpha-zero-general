@@ -64,16 +64,16 @@ class TestTwixtBoard(unittest.TestCase):
         move_3 = (4, 2)
         board.execute_move(move_3, RED)
         self.assertEqual(3, len(board.links_red))
-        self.assertTrue(board.get_num(move_2) in board.get_links(move_1))
-        self.assertTrue(board.get_num(move_3) in board.get_links(move_2))
-        self.assertTrue(board.get_num(move_1) in board.get_links(move_2))
-        self.assertFalse(board.get_num(move_3) in board.get_links(move_1))
+        self.assertTrue(move_2 in board.get_links(move_1))
+        self.assertTrue(move_3 in board.get_links(move_2))
+        self.assertTrue(move_1 in board.get_links(move_2))
+        self.assertFalse(move_3 in board.get_links(move_1))
 
         move_4 = (1, 2)
         board.execute_move(move_4, BLACK)
         move_5 = (3, 1)
         board.execute_move(move_5, BLACK)
-        self.assertFalse(board.get_num(move_4) in board.get_links(move_5), "expected block by red")
+        self.assertFalse(move_4 in board.get_links(move_5), "expected block by red")
 
     def test_is_win(self):
         board = TwixtBoard(SMALL_BOARD_SIZE)

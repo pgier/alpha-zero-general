@@ -58,6 +58,7 @@ class TwixtBoard:
         print(moves)
 
         return moves
+
     def has_legal_moves(self):
         for i in range(self.x):
             for j in range(self.y):
@@ -81,7 +82,7 @@ class TwixtBoard:
         return pos
 
     def get_links(self, position, color=GET_ALL):
-        pos = self.get_num(position)
+        pos = self.get_tuple(position)
         if color == RED:
             return self.links_red[pos]
         elif color == BLACK:
@@ -115,60 +116,59 @@ class TwixtBoard:
             self.links_red[position2].add(position1)
 
     def check_links(self, position, color):
-        pos = self.get_num(position)
-        (x, y) = self.get_tuple(position)
+        """ position is ALWAYS tuple """
+
+        (x, y) = position
 
         # Make sure it isn't along top row (0th row)
         if y > 0:
             # check (-2,-1)
-            if x > 1 and self.pegs[pos - 2 - self.n] == color:
+            if x > 1 and self.board[x - 2][y - 1] == color:
                 log(DEBUG, "connection W by NW")
-                self.connect_link(pos, pos - 2 - self.n, color)
+                self.connect_link(position, (x - 2, y - 1), color)
 
             # check (+2,-1)
-            if x < self.n - 2 and self.pegs[pos + 2 - self.n] == color:
+            if x < self.x - 2 and self.board[x + 2][y - 1] == color:
                 log(DEBUG, "connection E by NE")
-                self.connect_link(pos, pos + 2 - self.n, color)
+                self.connect_link(position, (x + 2, y - 1), color)
 
             # Make sure it isn't along top 2 rows (0th, 1st row)
             if y > 1:
                 # check (-1,-2)
-                if x > 0 and self.pegs[pos - 1 - self.n - self.n] == color:
+                if x > 0 and self.board[x-1][y-2] == color:
                     log(DEBUG, "connection N by NW")
-                    self.connect_link(pos, pos - 1 - self.n - self.n, color)
+                    self.connect_link(position, (x - 1, y - 2), color)
 
                 # check (+1,-2)
-                if x < self.n - 1 and self.pegs[pos + 1 - self.n - self.n] == color:
+                if x < self.x - 1 and self.board[x+1][y-2] == color:
                     log(DEBUG, "connection N by NE")
-                    self.connect_link(pos, pos + 1 - self.n - self.n, color)
+                    self.connect_link(position, (x + 1, y - 2), color)
 
         # Make sure it isn't along bottom row
-        if y < self.n - 1:
+        if y < self.y - 1:
             # check (+2,+1)
-            if x < self.n - 2 and self.pegs[pos + 2 + self.n] == color:
+            if x < self.x - 2 and self.board[x+2][y+1] == color:
                 log(DEBUG, "connection E by SE")
-                self.connect_link(pos, pos + 2 + self.n, color)
+                self.connect_link(position, (x + 2, y + 1), color)
 
             # check (-2,+1)
-            if x > 1 and self.pegs[pos - 2 + self.n] == color:
+            if x > 1 and self.board[x-2][y+1] == color:
                 log(DEBUG, "connection W by SW")
-                self.connect_link(pos, pos - 2 + self.n, color)
+                self.connect_link(position, (x - 2, y + 1), color)
 
-            if y < self.n - 2:
+            if y < self.y - 2:
 
                 # check (+1,+2)
-                if x < self.n - 1 and self.pegs[pos + 1 + self.n + self.n] == color:
+                if x < self.x - 1 and self.board[x+1][y+2] == color:
                     log(DEBUG, "connection S by SE")
-                    self.connect_link(pos, pos + 1 + self.n + self.n, color)
+                    self.connect_link(position, (x +1, y +2), color)
 
                 # check (-1,+2)
-                if x > 0 and self.pegs[pos - 1 + self.n + self.n] == color:
+                if x > 0 and self.board[x-1][y+2] == color:
                     log(DEBUG, "connection S by SW")
-                    self.connect_link(pos, pos - 1 + self.n + self.n, color)
+                    self.connect_link(position, (x - 1, y +2), color)
 
         return len(self.links_red), len(self.links_black)
-
-
 
     def is_win(self, color):
         return False
