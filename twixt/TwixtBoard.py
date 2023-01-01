@@ -129,39 +129,46 @@ class TwixtBoard:
         else:
             slope = False
         blocked = False
-        block_listing = list()
-        block_listing.append((vert - horiz + max(x1, x2),
-                              vert - horiz + min(y1, y2)))
-        block_listing.append((-vert + horiz + min(x1, x2),
-                              -vert + horiz + max(y1, y2)))
-        block_listing.append((-vert + min(x1, x2),
-                              horiz + max(y1, y2)))
-        block_listing.append((-vert + min(x1, x2),
-                              -horiz + min(y1, y2)))
-        block_listing.append((vert + max(x1, x2),
-                              min(y1, y2) - horiz))
-        block_listing.append((vert + max(x1, x2),
-                              horiz + max(y1, y2)))
+        a_block = list()
+        b_block = list()
+        a_block.append((vert - horiz + max(x1, x2),
+                        vert - horiz + min(y1, y2)))
+        a_block.append((-vert + horiz + min(x1, x2),
+                        -vert + horiz + max(y1, y2)))
+        b_block.append((-vert + min(x1, x2),
+                        horiz + max(y1, y2)))
+        b_block.append((-vert + min(x1, x2),
+                        -horiz + min(y1, y2)))
+        b_block.append((vert + max(x1, x2),
+                        min(y1, y2) - horiz))
+        b_block.append((vert + max(x1, x2),
+                        horiz + max(y1, y2)))
         if slope:
-            block_listing.append((horiz + max(x1, x2),
-                                  min(y1, y2) - vert))
-            block_listing.append((min(x1, x2) - horiz,
-                                  max(y1, y2 + vert)))
+            b_block.append((horiz + max(x1, x2),
+                            min(y1, y2) - vert))
+            b_block.append((min(x1, x2) - horiz,
+                            max(y1, y2 + vert)))
         else:
-            block_listing.append((min(x1, x2) - horiz,
-                                  min(y1, y2) - vert))
-            block_listing.append((max(x1, x2) + horiz,
-                                  max(y1, y2) + vert))
+            b_block.append((min(x1, x2) - horiz,
+                            min(y1, y2) - vert))
+            b_block.append((max(x1, x2) + horiz,
+                            max(y1, y2) + vert))
         xi = 0
         while - 3 + vert < xi < 3 - vert:
             yi = 0
             while - 3 + horiz < yi < 3 - horiz:
                 if (xi != 0 or yi != 0) and (xi + x1 != x2 or yi + y1 != y2):
                     if self.board[xi + x1][yi + y1] != 0:
-                        for i in range(len(block_listing)):
-                            if block_listing[i] in self.get_links(((xi + x1), (yi + y1))):
-                                return blocked
-                    block_listing.append(((xi + x1), (yi + y1)))
+                        if (vert * yi + horiz * xi == 0) or (
+                                vert * (yi + y1) + horiz * (xi + x1) == vert * y2 + horiz * x2):
+                            for i in range(len(a_block)):
+                                if a_block[i] in self.get_links(((xi + x1), (yi + y1))):
+                                    return blocked
+                            a_block.append(((xi + x1), (yi + y1)))
+                        else:
+                            for i in range(len(b_block)):
+                                if b_block[i] in self.get_links(((xi + x1), (yi + y1))):
+                                    return blocked
                 yi = (yi + vert * ydiff // 2 + horiz * ydiff)
             xi = (xi + horiz * xdiff // 2 + vert * xdiff)
         return not blocked

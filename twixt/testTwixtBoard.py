@@ -83,13 +83,18 @@ class TestTwixtBoard(unittest.TestCase):
         move_4 = (5, 3)
         move_5 = (4, 2)
         move_6 = (3, 4)
+        move_7 = (0, 1)
+        move_8 = (1, 3)
         board.execute_move(move_1, RED)
         board.execute_move(move_2, BLACK)
         board.execute_move(move_3, RED)
         board.execute_move(move_4, BLACK)
         board.execute_move(move_6, RED)
         board.execute_move(move_5, BLACK)
+        board.execute_move(move_7, RED)
+        board.execute_move(move_8, RED)
         self.assertFalse(move_6 in board.get_links(move_3))
+        self.assertTrue(move_8 in board.get_links(move_7))
 
 
     def test_is_win(self):
