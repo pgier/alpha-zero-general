@@ -124,7 +124,6 @@ class TwixtBoard:
         (x2, y2) = pos2
         (xdiff, ydiff) = (x2 - x1, y2 - y1)
         (vert, horiz) = (xdiff % 2, ydiff % 2)  # vert is 1 when vertical, horiz is 1 when horizontal
-        possible = numpy.zeros((3 - vert, 3 - horiz), numpy.int8)
 
         if xdiff * ydiff > 0:
             slope = True
@@ -160,17 +159,12 @@ class TwixtBoard:
             while - 3 + horiz < yi < 3 - horiz:
                 if (xi != 0 or yi != 0) and (xi + x1 != x2 or yi + y1 != y2):
                     if self.board[xi + x1][yi + y1] != 0:
-                        possible[abs(xi)][abs(yi)] = self.board[xi + x1][yi + y1]
                         for i in range(len(block_listing)):
                             if block_listing[i] in self.get_links(((xi + x1), (yi + y1))):
                                 return blocked
-                else:
-                    possible[abs(xi)][abs(yi)] = 5
-                block_listing.append(((xi + x1), (yi + y1)))
+                    block_listing.append(((xi + x1), (yi + y1)))
                 yi = (yi + vert * ydiff // 2 + horiz * ydiff)
             xi = (xi + horiz * xdiff // 2 + vert * xdiff)
-
-        print(possible)
         return not blocked
 
     def check_links(self, position, color):
