@@ -1,6 +1,7 @@
 """
 Unit Tests for the TwixtBoard class
 """
+import random
 import unittest
 
 from twixt.TwixtBoard import *
@@ -73,6 +74,23 @@ class TestTwixtBoard(unittest.TestCase):
         move_5 = (3, 1)
         board.execute_move(move_5, BLACK)
         self.assertFalse(move_4 in board.get_links(move_5), "expected block by red")
+
+    def test_twixt_links2(self):
+        board = TwixtBoard(SMALL_BOARD_SIZE)
+        move_1 = (1, 1)
+        move_2 = (3, 2)
+        move_3 = (2, 3)
+        move_4 = (5, 3)
+        move_5 = (4, 2)
+        move_6 = (3, 4)
+        board.execute_move(move_1, RED)
+        board.execute_move(move_2, BLACK)
+        board.execute_move(move_3, RED)
+        board.execute_move(move_4, BLACK)
+        board.execute_move(move_6, RED)
+        board.execute_move(move_5, BLACK)
+        self.assertFalse(move_6 in board.get_links(move_3))
+
 
     def test_is_win(self):
         board = TwixtBoard(SMALL_BOARD_SIZE)

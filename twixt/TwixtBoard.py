@@ -124,7 +124,6 @@ class TwixtBoard:
         (x2, y2) = pos2
         (xdiff, ydiff) = (x2 - x1, y2 - y1)
         (vert, horiz) = (xdiff % 2, ydiff % 2)  # vert is 1 when vertical, horiz is 1 when horizontal
-
         if xdiff * ydiff > 0:
             slope = True
         else:
