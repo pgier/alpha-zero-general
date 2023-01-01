@@ -68,7 +68,6 @@ class TestTwixtBoard(unittest.TestCase):
         self.assertTrue(move_3 in board.get_links(move_2))
         self.assertTrue(move_1 in board.get_links(move_2))
         self.assertFalse(move_3 in board.get_links(move_1))
-
         move_4 = (1, 2)
         board.execute_move(move_4, BLACK)
         move_5 = (3, 1)

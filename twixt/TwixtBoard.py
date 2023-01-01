@@ -103,17 +103,75 @@ class TwixtBoard:
             if position2 not in self.links_black:
                 self.links_black[position2] = set()
 
-            self.links_black[position1].add(position2)
-            self.links_black[position2].add(position1)
+            if self.check_blocks(position1, position2):
+                self.links_black[position1].add(position2)
+                self.links_black[position2].add(position1)
         if color == RED:
             if position1 not in self.links_red:
                 self.links_red[position1] = set()
 
             if position2 not in self.links_red:
                 self.links_red[position2] = set()
-            self.links_red[position1]
-            self.links_red[position1].add(position2)
-            self.links_red[position2].add(position1)
+
+            if self.check_blocks(position1, position2):
+                self.links_red[position1].add(position2)
+                self.links_red[position2].add(position1)
+
+    def check_blocks(self, pos1, pos2):
+        '''pos1 and pos2 are tuples'''
+        # 4 different types: check 3x2 area for links
+        (x1, y1) = pos1
+        (x2, y2) = pos2
+        (xdiff, ydiff) = (x2 - x1, y2 - y1)
+        (vert, horiz) = (xdiff % 2, ydiff % 2)  # vert is 1 when vertical, horiz is 1 when horizontal
+        possible = numpy.zeros((3 - vert, 3 - horiz), numpy.int8)
+
+        if xdiff * ydiff > 0:
+            slope = True
+        else:
+            slope = False
+        blocked = False
+        block_listing = list()
+        block_listing.append((vert - horiz + max(x1, x2),
+                              vert - horiz + min(y1, y2)))
+        block_listing.append((-vert + horiz + min(x1, x2),
+                              -vert + horiz + max(y1, y2)))
+        block_listing.append((-vert + min(x1, x2),
+                              horiz + max(y1, y2)))
+        block_listing.append((-vert + min(x1, x2),
+                              -horiz + min(y1, y2)))
+        block_listing.append((vert + max(x1, x2),
+                              min(y1, y2) - horiz))
+        block_listing.append((vert + max(x1, x2),
+                              horiz + max(y1, y2)))
+        if slope:
+            block_listing.append((horiz + max(x1, x2),
+                                  min(y1, y2) - vert))
+            block_listing.append((min(x1, x2) - horiz,
+                                  max(y1, y2 + vert)))
+        else:
+            block_listing.append((min(x1, x2) - horiz,
+                                  min(y1, y2) - vert))
+            block_listing.append((max(x1, x2) + horiz,
+                                  max(y1, y2) + vert))
+        xi = 0
+        while - 3 + vert < xi < 3 - vert:
+            yi = 0
+            while - 3 + horiz < yi < 3 - horiz:
+                if (xi != 0 or yi != 0) and (xi + x1 != x2 or yi + y1 != y2):
+                    if self.board[xi + x1][yi + y1] != 0:
+                        possible[abs(xi)][abs(yi)] = self.board[xi + x1][yi + y1]
+                        for i in range(len(block_listing)):
+                            if block_listing[i] in self.get_links(((xi + x1), (yi + y1))):
+                                return blocked
+                else:
+                    possible[abs(xi)][abs(yi)] = 5
+                block_listing.append(((xi + x1), (yi + y1)))
+                yi = (yi + vert * ydiff // 2 + horiz * ydiff)
+            xi = (xi + horiz * xdiff // 2 + vert * xdiff)
+
+        print(possible)
+        return not blocked
 
     def check_links(self, position, color):
         """ position is ALWAYS tuple """
@@ -135,38 +193,38 @@ class TwixtBoard:
             # Make sure it isn't along top 2 rows (0th, 1st row)
             if y > 1:
                 # check (-1,-2)
-                if x > 0 and self.board[x-1][y-2] == color:
+                if x > 0 and self.board[x - 1][y - 2] == color:
                     log(DEBUG, "connection N by NW")
                     self.connect_link(position, (x - 1, y - 2), color)
 
                 # check (+1,-2)
-                if x < self.x - 1 and self.board[x+1][y-2] == color:
+                if x < self.x - 1 and self.board[x + 1][y - 2] == color:
                     log(DEBUG, "connection N by NE")
                     self.connect_link(position, (x + 1, y - 2), color)
 
         # Make sure it isn't along bottom row
         if y < self.y - 1:
             # check (+2,+1)
-            if x < self.x - 2 and self.board[x+2][y+1] == color:
+            if x < self.x - 2 and self.board[x + 2][y + 1] == color:
                 log(DEBUG, "connection E by SE")
                 self.connect_link(position, (x + 2, y + 1), color)
 
             # check (-2,+1)
-            if x > 1 and self.board[x-2][y+1] == color:
+            if x > 1 and self.board[x - 2][y + 1] == color:
                 log(DEBUG, "connection W by SW")
                 self.connect_link(position, (x - 2, y + 1), color)
 
             if y < self.y - 2:
 
                 # check (+1,+2)
-                if x < self.x - 1 and self.board[x+1][y+2] == color:
+                if x < self.x - 1 and self.board[x + 1][y + 2] == color:
                     log(DEBUG, "connection S by SE")
-                    self.connect_link(position, (x +1, y +2), color)
+                    self.connect_link(position, (x + 1, y + 2), color)
 
                 # check (-1,+2)
-                if x > 0 and self.board[x-1][y+2] == color:
+                if x > 0 and self.board[x - 1][y + 2] == color:
                     log(DEBUG, "connection S by SW")
-                    self.connect_link(position, (x - 1, y +2), color)
+                    self.connect_link(position, (x - 1, y + 2), color)
 
         return len(self.links_red), len(self.links_black)
 
