@@ -5,13 +5,13 @@ import unittest
 
 from twixt.TwixtGame import TwixtGame
 
-TEST_BOARD_SIZE = 12
+TEST_BOARD_SIZE = 6
 
 
 class TestTwixtGame(unittest.TestCase):
 
     def setUp(self):
-        self.game = TwixtGame(TEST_BOARD_SIZE)
+        pass
 
     def test_get_board_size(self):
         current_board_size = self.game.getBoardSize()
