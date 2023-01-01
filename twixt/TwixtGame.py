@@ -86,4 +86,30 @@ class TwixtGame(Game):
 
     @staticmethod
     def display(board):
-        print("nothing here")
+        print("here is the board")
+        bx = board.x
+        by = board.y
+        vx = 0
+        vy = by - 1
+        nx = 0
+        ny = by - 1
+        for y in reversed(range(by)):
+            print(ny, end="  ")
+            for x in range(bx):
+                value = board[x][y]
+                if value == 1:
+                    print("r", end="  ")
+                elif value == -1:
+                    print("b", end="  ")
+                else:
+                    print("e", end="  ")
+            print()
+            vy -= 1
+            ny -= 1
+        print("x", end="  ")
+        for n in range(bx):
+            print(vx, end="  ")
+            vx += 1
+
+
+
