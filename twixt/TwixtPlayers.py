@@ -14,6 +14,9 @@ class RandomPlayer:
         valid_moves = self.game.getValidMoves(board, 1)
         while valid_moves[a] != 1:
             a = np.random.randint(self.game.getActionSize())
+        (board_x, _) = board.shape
+        (x, y) = (a % board_x, a // board_x)
+        print("random move: {0} {1}".format(x, y))
         return a
 
 
