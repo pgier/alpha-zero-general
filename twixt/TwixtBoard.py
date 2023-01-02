@@ -157,7 +157,9 @@ class TwixtBoard:
         (x, y) = self.get_tuple(position)
         links = list()
         for i in get_bits(self.get(x, y)):
-            links.append(self.get(x, y, LINK_OFFSET_DICT[i]))
+            if i != 1:
+                (a, b) = LINK_OFFSET_DICT[i]
+                links.append((x + a, y + b))
         return links
 
     def connect_link(self, x, y, direction):
