@@ -48,8 +48,8 @@ class TestTwixtBoard(unittest.TestCase):
 
         board = TwixtBoard(SMALL_BOARD_SIZE)
         current_player = RED
-        for x in range(board.n):
-            for y in range(board.n):
+        for x in range(board.x):
+            for y in range(board.y):
                 move = (x, y)
                 board.execute_move(move, current_player)
                 current_player *= -1
