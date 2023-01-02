@@ -5,6 +5,7 @@ import numpy as np
 from logging import *
 from twixt.TwixtUtil import *
 
+
 EMPTY = 0
 RED = 1
 BLACK = -1
@@ -103,9 +104,14 @@ class TwixtBoard:
         return self.state[x + a][y + b]
 
     def get_legal_moves(self, color):
+        if color == RED:
+            xdiff = 1
+        elif color == BLACK:
+            ydiff = 1
+
         moves = list()
-        for i in range(self.x):
-            for j in range(self.y):
+        for i in range(xdiff, self.x - xdiff):
+            for j in range(ydiff, self.y - ydiff):
                 if self.state[i][j] == 0:
                     new_move = (i, j)
                     moves.append(new_move)
@@ -133,20 +139,12 @@ class TwixtBoard:
             pos = position
         return pos
 
-    def get_links(self, position, color=GET_ALL):
-        pos = self.get_tuple(position)
-        if color == RED:
-            return self.links_red[pos]
-        elif color == BLACK:
-            return self.links_black[pos]
-        else:
-            if pos in self.links_red:
-                return self.links_red[pos]
-            elif pos in self.links_black:
-                return self.links_black[pos]
-            else:
-                return None
-
+    def get_links(self, position, color = GET_ALL): #might not need color anymore
+        (x, y) = self.get_tuple(position)
+        links = list()
+        for i in get_bits(self.get(x, y)):
+            links.append(self.get(x, y, LINK_OFFSET_DICT[i]))
+        return links
     def connect_link(self, x, y, direction, color):
         """ Link the given x, y peg to the peg in the given direction (if not blocked) """
         p1 = (x, y)
