@@ -284,30 +284,20 @@ class TwixtBoard:
             for i in range(self.x-1):
                 if self.state[i][0] != 0:
                     stack.append((i, 0))
-            while len(stack) > 0:
-                (x, y) = stack[len(stack)-1]
-                if y == self.y - 1:
-                    return win
-                links = self.get_links((x, y))
-                for (a, b) in links:
-                    if (a, b) not in seen:
-                        stack.append((a, b))
-                stack.remove((x, y))
-                seen.append((x, y))
         if color == BLACK:
             for i in range(self.y-1):
                 if self.state[0][i] != 0:
                     stack.append((0, i))
-            while len(stack) > 0:
-                (x, y) = stack[len(stack) - 1]
-                if y == self.y - 1:
-                    return win
-                links = self.get_links((x, y))
-                for (a, b) in links:
-                    if (a, b) not in seen:
-                        stack.append((a, b))
-                stack.remove((x, y))
-                seen.append((x, y))
+        while len(stack) > 0:
+            (x, y) = stack[len(stack) - 1]
+            if y == self.y - 1:
+                return win
+            links = self.get_links((x, y))
+            for (a, b) in links:
+                if (a, b) not in seen:
+                    stack.append((a, b))
+            stack.remove((x, y))
+            seen.append((x, y))
         return not win
 
     def execute_move(self, move, color):
