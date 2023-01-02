@@ -65,6 +65,9 @@ LINK_REVERSE_DICT = {
     NORTH_NW: SOUTH_SE_OFFSET,
 }
 
+# Alias the `sign` function to the name get_color for easy readability
+get_color = sign
+
 
 class TwixtBoard:
     """
@@ -139,14 +142,16 @@ class TwixtBoard:
             pos = position
         return pos
 
-    def get_links(self, position, color = GET_ALL): #might not need color anymore
+    def get_links(self, position):
         (x, y) = self.get_tuple(position)
         links = list()
         for i in get_bits(self.get(x, y)):
             links.append(self.get(x, y, LINK_OFFSET_DICT[i]))
         return links
-    def connect_link(self, x, y, direction, color):
-        """ Link the given x, y peg to the peg in the given direction (if not blocked) """
+
+    def connect_link(self, x, y, direction):
+
+        """ Link the peg as position (x, y) to the peg in the given direction (if not blocked) """
         p1 = (x, y)
         (ox, oy) = LINK_OFFSET_DICT[direction]
         (x2, y2) = (x + ox, y + oy)
@@ -157,6 +162,7 @@ class TwixtBoard:
             self.state[x2][y2] = set_bits(self.state[x2][y2], LINK_REVERSE_DICT(direction))
 
         # TODO: this section maybe can be removed
+        color = sign(self.state[x][y])
         if color == BLACK:
             if p1 not in self.links_black:
                 self.links_black[p1] = set()
@@ -180,7 +186,7 @@ class TwixtBoard:
         # TODO: end remove section
 
     def check_blocks(self, pos1, pos2):
-        '''pos1 and pos2 are tuples'''
+        """pos1 and pos2 are tuples"""
         # 4 different types: check 3x2 area for links
         (x1, y1) = pos1
         (x2, y2) = pos2
@@ -237,63 +243,52 @@ class TwixtBoard:
             xi = (xi + horiz * xdiff // 2 + vert * xdiff)
         return not blocked
 
-    def update_links(self, position, color):
+    def update_links(self, position):
         """
         Find and create links which are made possible by the new peg at `position`.
         Position must be an (x, y) tuple.
         """
 
         (x, y) = position
+        color = get_color(self.state[x][y])
 
         # Make sure it isn't along the bottom row (0th row)
         if y > 0:
-            # check (-2,-1)
-            if x > 1 and (color * self.get(x, y, WEST_NW_OFFSET)) > 0:
-                log(DEBUG, "connection W by NW")
-                self.connect_link(position, (x - 2, y - 1), color)
-
-            # check (+2,-1)
-            if x < self.x - 2 and (color * self.get(x, y, EAST_NE_OFFSET)) > 0:
-                log(DEBUG, "connection E by NE")
-                self.connect_link(position, (x + 2, y - 1), color)
-
-            # Make sure it isn't along top 2 rows (0th, 1st row)
-            if y > 1:
-                # check (-1,-2)
-                if x > 0 and self.state[x - 1][y - 2] == color:
-                    log(DEBUG, "connection N by NW")
-                    self.connect_link(position, (x - 1, y - 2), color)
-
-                # check (+1,-2)
-                if x < self.x - 1 and self.state[x + 1][y - 2] == color:
-                    log(DEBUG, "connection N by NE")
-                    self.connect_link(position, (x + 1, y - 2), color)
-
-        # Make sure it isn't along top row
-        if y < self.y - 1:
-            # check (+2,+1)
-            if x < self.x - 2 and self.state[x + 2][y + 1] == color:
-                log(DEBUG, "connection E by SE")
-                self.connect_link(position, (x + 2, y + 1), color)
-
-            # check (-2,+1)
-            if x > 1 and self.state[x - 2][y + 1] == color:
+            if x > 1 and (get_color(self.get(x, y, WEST_SW_OFFSET)) == color):
                 log(DEBUG, "connection W by SW")
-                self.connect_link(position, (x - 2, y + 1), color)
+                self.connect_link(x, y, WEST_SW)
+
+            if x < self.x - 2 and (color * self.get(x, y, EAST_SE_OFFSET) == color):
+                log(DEBUG, "connection E by SE")
+                self.connect_link(x, y, EAST_SE)
+
+            # Make sure it isn't along bottom 2 rows (0th, 1st row)
+            if y > 1:
+                if x > 0 and (color * self.get(x, y, SOUTH_SW_OFFSET) == color):
+                    log(DEBUG, "connection S by SW")
+                    self.connect_link(x, y, SOUTH_SW)
+
+                if x < self.x - 1 and (color * self.get(x, y, SOUTH_SE_OFFSET) == color):
+                    log(DEBUG, "connection S by SE")
+                    self.connect_link(x, y, SOUTH_SE)
+
+        # Make sure it isn't along the top row
+        if y < self.y - 1:
+            if x < self.x - 2 and (get_color(self.get(x, y, EAST_NE_OFFSET)) == color):
+                log(DEBUG, "connection E by NE")
+                self.connect_link(x, y, EAST_NE)
+
+            if x > 1 and (get_color(self.get(x, y, WEST_NW_OFFSET)) == color):
+                log(DEBUG, "connection W by NW")
+                self.connect_link(x, y, WEST_NW)
 
             if y < self.y - 2:
-
-                # check (+1,+2)
-                if x < self.x - 1 and self.state[x + 1][y + 2] == color:
-                    log(DEBUG, "connection S by SE")
-                    self.connect_link(position, (x + 1, y + 2), color)
-
-                # check (-1,+2)
-                if x > 0 and self.state[x - 1][y + 2] == color:
-                    log(DEBUG, "connection S by SW")
-                    self.connect_link(position, (x - 1, y + 2), color)
-
-        return len(self.links_red), len(self.links_black)
+                if x < self.x - 1 and (get_color(self.get(x, y, NORTH_NW_OFFSET)) == color):
+                    log(DEBUG, "connection N by NW")
+                    self.connect_link(x, y, NORTH_NW)
+                if x > 0 and (get_color(self.get(x, y, NORTH_NE_OFFSET)) == color):
+                    log(DEBUG, "connection N by NE")
+                    self.connect_link(x, y, NORTH_NE)
 
     def is_win(self, color):
         seen = list()
