@@ -309,31 +309,35 @@ class TwixtBoard:
         stack = list()
         win = True
         if color == RED:
-            for i in range(self.x):
+            for i in range(self.x-1):
                 if self.state[i][0] != 0:
-                    stack.append(i, 0)
-            while len(stack > 0):
+                    stack.append((i, 0))
+            while len(stack) > 0:
                 (x, y) = stack[len(stack)-1]
                 if y == self.y - 1:
                     return win
-                for i in get_bits(self.state[x][y]):
-                    if self.get(x, y, LINK_OFFSET_DICT(i)) not in seen:
-                        stack.append(self.get(x, y, LINK_OFFSET_DICT(i)))
-                stack.remove(x, y)
-                seen.append(x, y)
-        elif color == BLACK:
-            for i in range(self.y):
+                for j in get_bits(self.state[x][y]):
+                    if j != 1:
+                        (a, b) = LINK_OFFSET_DICT[j]
+                        if (x+a, y+b) not in seen:
+                            stack.append((x+a, y+b))
+                stack.remove((x, y))
+                seen.append((x, y))
+        if color == BLACK:
+            for i in range(self.y-1):
                 if self.state[0][i] != 0:
-                    stack.append(0, i)
-            while len(stack > 0):
-                (x, y) = stack[len(stack) - 1]
+                    stack.append((0, i))
+            while len(stack) > 0:
+                (x, y) = stack[len(stack)-1]
                 if x == self.x - 1:
                     return win
-                for i in get_bits(self.state[x][y]):
-                    if self.get(x, y, LINK_OFFSET_DICT(i)) not in seen:
-                        stack.append(self.get(x, y, LINK_OFFSET_DICT(i)))
-                stack.remove(x, y)
-                seen.append(x, y)
+                for j in get_bits(self.state[x][y]):
+                    if j != 1:
+                        (a, b) = LINK_OFFSET_DICT[j]
+                        if (x+a, y+b) not in seen:
+                            stack.append((x+a, y+b))
+                stack.remove((x, y))
+                seen.append((x, y))
         return not win
 
     def execute_move(self, move, color):
