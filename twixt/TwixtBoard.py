@@ -157,16 +157,18 @@ class TwixtBoard:
             while - 3 + horiz < yi < 3 - horiz:
                 if (xi != 0 or yi != 0) and (xi + x1 != x2 or yi + y1 != y2):
                     if self.board[xi + x1][yi + y1] != 0:
-                        if (vert * yi + horiz * xi == 0) or (
-                                vert * (yi + y1) + horiz * (xi + x1) == vert * y2 + horiz * x2):
-                            for i in range(len(a_block)):
-                                if a_block[i] in self.get_links(((xi + x1), (yi + y1))):
-                                    return blocked
-                            a_block.append(((xi + x1), (yi + y1)))
-                        else:
-                            for i in range(len(b_block)):
-                                if b_block[i] in self.get_links(((xi + x1), (yi + y1))):
-                                    return blocked
+                        if self.get_links(((xi + x1), (y1 + yi))):
+                            if (vert * yi + horiz * xi == 0) or (
+                                    vert * (yi + y1) + horiz * (xi + x1) == vert * y2 + horiz * x2):
+                                for i in range(len(a_block)):
+
+                                    if a_block[i] in self.get_links(((xi + x1), (yi + y1))):
+                                        return blocked
+                                a_block.append(((xi + x1), (yi + y1)))
+                            else:
+                                for i in range(len(b_block)):
+                                    if b_block[i] in self.get_links(((xi + x1), (yi + y1))):
+                                        return blocked
                 yi = (yi + vert * ydiff // 2 + horiz * ydiff)
             xi = (xi + horiz * xdiff // 2 + vert * xdiff)
         return not blocked
