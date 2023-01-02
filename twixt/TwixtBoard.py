@@ -60,9 +60,9 @@ LINK_REVERSE_DICT = {
     EAST_SE: WEST_NW,
     SOUTH_SE: NORTH_NW,
     SOUTH_SW: NORTH_NE,
-    WEST_SW: EAST_NE_OFFSET,
-    WEST_NW: EAST_SE_OFFSET,
-    NORTH_NW: SOUTH_SE_OFFSET,
+    WEST_SW: EAST_NE,
+    WEST_NW: EAST_SE,
+    NORTH_NW: SOUTH_SE,
 }
 
 # Alias the `sign` function to the name get_color for easy readability
@@ -101,12 +101,23 @@ class TwixtBoard:
     def __getitem__(self, index):
         return self.state[index]
 
+    # def get(self, pos):
+    #     (x, y) = pos
+    #     return self.state[x][y]
+
     def get(self, x=0, y=0, offset=(0, 0)):
         """ Get the board state at the given (x, y) position with an optional offset"""
         (a, b) = offset
         return self.state[x + a][y + b]
 
+    def get_pos(self, pos):
+        """ Get the board state at the given (x, y) position"""
+        (x, y) = pos
+        return self.state[x][y]
+
     def get_legal_moves(self, color):
+        xdiff = 0
+        ydiff = 0
         if color == RED:
             xdiff = 1
         elif color == BLACK:
@@ -159,7 +170,8 @@ class TwixtBoard:
 
         if self.check_blocks(p1, p2):
             self.state[x][y] = set_bits(self.state[x][y], direction)
-            self.state[x2][y2] = set_bits(self.state[x2][y2], LINK_REVERSE_DICT(direction))
+            reverse_dir = LINK_REVERSE_DICT[direction]
+            self.state[x2][y2] = set_bits(self.state[x2][y2], reverse_dir)
 
         # TODO: this section maybe can be removed
         color = sign(self.state[x][y])
@@ -322,9 +334,8 @@ class TwixtBoard:
                 seen.append(x, y)
         return not win
 
-
     def execute_move(self, move, color):
         (x, y) = move
         assert self.state[x][y] == 0
         self.state[x][y] = color
-        self.update_links(move, color)
+        self.update_links(move)

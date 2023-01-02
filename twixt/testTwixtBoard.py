@@ -27,10 +27,10 @@ class TestTwixtBoard(unittest.TestCase):
 
     def test_board_get(self):
         board = TwixtBoard(SMALL_BOARD_SIZE)
-        move = (2, 3)
-        self.assertEqual(EMPTY, board.get(move))
-        board.execute_move(move, RED)
-        self.assertEqual(RED, board.get(move), "expected red, found {0}".format(color_name[board.get(move)]))
+        pos = (2, 3)
+        self.assertEqual(EMPTY, board.get_pos(pos))
+        board.execute_move(pos, RED)
+        self.assertEqual(RED, board.get_pos(pos), "expected red, found {0}".format(color_name[board.get_pos(pos)]))
 
     def test_has_legal_moves(self):
         board = TwixtBoard(SMALL_BOARD_SIZE)
