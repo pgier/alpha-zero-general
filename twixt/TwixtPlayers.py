@@ -26,14 +26,14 @@ class HumanPlayer:
         valid = self.game.getValidMoves(board, 1)
         for i in range(len(valid)):
             if valid[i]:
-                print(int(i / self.game.n), int(i % self.game.n))
+                print(int(i / self.game.size), int(i % self.game.size))
         while True:
             user_input = input()
             # Python 2.x
             # a = raw_input()
 
             x, y = [int(x) for x in user_input.split(' ')]
-            a = self.game.n * x + y if x != -1 else self.game.n ** 2
+            a = self.game.size * x + y if x != -1 else self.game.size ** 2
             if valid[a]:
                 break
             else:

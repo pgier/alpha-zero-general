@@ -46,11 +46,11 @@ class TwixtGame(Game):
             valid_moves[-1] = 1
             return np.array(valid_moves)
         for x, y in legal_moves:
-            valid_moves[self.n * y + x] = 1
+            valid_moves[self.size * y + x] = 1
         return np.array(valid_moves)
 
     def getGameEnded(self, board, player):
-        b = TwixtBoard(self.n, self.handicap)
+        b = TwixtBoard(self.size, self.handicap)
         b.board = np.copy(board)
 
         if b.is_win(player):
@@ -87,8 +87,8 @@ class TwixtGame(Game):
     @staticmethod
     def display(board):
         print("here is the board")
-        bx = board.x
-        by = board.y
+        bx, by = board.shape
+        # by = board.y
         vx = 0
         vy = by - 1
         nx = 0
@@ -110,6 +110,3 @@ class TwixtGame(Game):
         for n in range(bx):
             print(vx, end="  ")
             vx += 1
-
-
-
