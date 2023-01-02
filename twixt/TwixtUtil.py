@@ -20,5 +20,5 @@ def sign(x):
 
 
 def set_bits(x, mask):
-    color = sign(x)
-    return (color * mask) + x
+    """ sets the bits in mask to 1 if x is positive and 0 if x is negative"""
+    return (sign(x) * mask) + x

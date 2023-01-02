@@ -3,6 +3,7 @@ Board logic for the game of TwixT.
 """
 import numpy as np
 from logging import *
+from twixt.TwixtUtil import *
 
 EMPTY = 0
 RED = 1
@@ -38,6 +39,30 @@ SOUTH_SW_OFFSET = (-1, -2)
 WEST_SW_OFFSET = (-2, -1)
 WEST_NW_OFFSET = (-2, 1)
 NORTH_NW_OFFSET = (-1, 2)
+
+LINK_OFFSET_DICT = {
+    EMPTY: (0, 0),
+    NORTH_NE: NORTH_NE_OFFSET,
+    EAST_NE: EAST_NE_OFFSET,
+    EAST_SE: EAST_SE_OFFSET,
+    SOUTH_SE: SOUTH_SE_OFFSET,
+    SOUTH_SW: SOUTH_SW_OFFSET,
+    WEST_SW: WEST_SW_OFFSET,
+    WEST_NW: WEST_NW_OFFSET,
+    NORTH_NW: NORTH_NW_OFFSET,
+}
+
+LINK_REVERSE_DICT = {
+    EMPTY: EMPTY,
+    NORTH_NE: SOUTH_SW,
+    EAST_NE: WEST_SW,
+    EAST_SE: WEST_NW,
+    SOUTH_SE: NORTH_NW,
+    SOUTH_SW: NORTH_NE,
+    WEST_SW: EAST_NE_OFFSET,
+    WEST_NW: EAST_SE_OFFSET,
+    NORTH_NW: SOUTH_SE_OFFSET,
+}
 
 
 class TwixtBoard:
@@ -122,27 +147,39 @@ class TwixtBoard:
             else:
                 return None
 
-    def connect_link(self, position1, position2, color):
+    def connect_link(self, x, y, direction, color):
+        """ Link the given x, y peg to the peg in the given direction (if not blocked) """
+        p1 = (x, y)
+        (ox, oy) = LINK_OFFSET_DICT[direction]
+        (x2, y2) = (x + ox, y + oy)
+        p2 = (x2, y2)
+
+        if self.check_blocks(p1, p2):
+            self.state[x][y] = set_bits(self.state[x][y], direction)
+            self.state[x2][y2] = set_bits(self.state[x2][y2], LINK_REVERSE_DICT(direction))
+
+        # TODO: this section maybe can be removed
         if color == BLACK:
-            if position1 not in self.links_black:
-                self.links_black[position1] = set()
+            if p1 not in self.links_black:
+                self.links_black[p1] = set()
 
-            if position2 not in self.links_black:
-                self.links_black[position2] = set()
+            if p2 not in self.links_black:
+                self.links_black[p2] = set()
 
-            if self.check_blocks(position1, position2):
-                self.links_black[position1].add(position2)
-                self.links_black[position2].add(position1)
+            if self.check_blocks(p1, p2):
+                self.links_black[p1].add(p2)
+                self.links_black[p2].add(p1)
         if color == RED:
-            if position1 not in self.links_red:
-                self.links_red[position1] = set()
+            if p1 not in self.links_red:
+                self.links_red[p1] = set()
 
-            if position2 not in self.links_red:
-                self.links_red[position2] = set()
+            if p2 not in self.links_red:
+                self.links_red[p2] = set()
 
-            if self.check_blocks(position1, position2):
-                self.links_red[position1].add(position2)
-                self.links_red[position2].add(position1)
+            if self.check_blocks(p1, p2):
+                self.links_red[p1].add(p2)
+                self.links_red[p2].add(p1)
+        # TODO: end remove section
 
     def check_blocks(self, pos1, pos2):
         '''pos1 and pos2 are tuples'''
