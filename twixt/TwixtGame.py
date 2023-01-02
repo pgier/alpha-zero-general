@@ -99,10 +99,14 @@ class TwixtGame(Game):
                 value = board[x][y]
                 if value == 1:
                     print("r", end="  ")
+                elif value > 1:
+                    print("R", end="  ")
                 elif value == -1:
                     print("b", end="  ")
+                elif value < -1:
+                    print("B", end="  ")
                 else:
-                    print("e", end="  ")
+                    print(".", end="  ")
             print()
             vy -= 1
             ny -= 1
