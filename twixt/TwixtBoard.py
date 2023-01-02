@@ -93,10 +93,6 @@ class TwixtBoard:
             raise Exception(
                 "Invalid type for board state.  Expected `None` or `numpy.ndarray`, got {0}".format(type(state)))
 
-        # TODO: remove the `links` dictionaries and store the links in the two dimensional `board` array
-        self.links_red = dict()
-        self.links_black = dict()
-
     # add [][] indexer syntax to the Board
     def __getitem__(self, index):
         return self.state[index]
@@ -174,30 +170,6 @@ class TwixtBoard:
             self.state[x][y] = set_bits(self.state[x][y], direction)
             reverse_dir = LINK_REVERSE_DICT[direction]
             self.state[x2][y2] = set_bits(self.state[x2][y2], reverse_dir)
-
-        # TODO: this section maybe can be removed
-        color = sign(self.state[x][y])
-        if color == BLACK:
-            if p1 not in self.links_black:
-                self.links_black[p1] = set()
-
-            if p2 not in self.links_black:
-                self.links_black[p2] = set()
-
-            if self.check_blocks(p1, p2):
-                self.links_black[p1].add(p2)
-                self.links_black[p2].add(p1)
-        if color == RED:
-            if p1 not in self.links_red:
-                self.links_red[p1] = set()
-
-            if p2 not in self.links_red:
-                self.links_red[p2] = set()
-
-            if self.check_blocks(p1, p2):
-                self.links_red[p1].add(p2)
-                self.links_red[p2].add(p1)
-        # TODO: end remove section
 
     def check_blocks(self, pos1, pos2):
         """pos1 and pos2 are tuples"""
