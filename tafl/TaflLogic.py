@@ -8,7 +8,7 @@ class Board():
       self.size=gv.size  
       self.width=gv.size
       self.height=gv.size
-      self.board=gv.board #[x,y,type]
+      self.board=gv.state #[x,y,type]
       self.pieces=gv.pieces #[x,y,type]
       self.time=0
       self.done=0
@@ -181,5 +181,3 @@ class Board():
                   if self._isLegalMove(pieceno,piece[0],y)>=0:moves.extend([[piece[0],piece[1],piece[0],y]])
        #print("moves ",moves)
        return moves
-
-

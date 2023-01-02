@@ -1,11 +1,17 @@
+import sys
 import os
-
 # os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
 
-import Arena
+sys.path.append(parent)
+
 from MCTS import MCTS
 from twixt.TwixtGame import TwixtGame
 from twixt.TwixtPlayers import *
+
+
+import Arena
 
 import numpy as np
 from utils import *

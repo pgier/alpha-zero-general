@@ -1,7 +1,7 @@
 """
 Board logic for the game of TwixT.
 """
-import numpy
+import numpy as np
 from logging import *
 
 EMPTY = 0
@@ -14,45 +14,74 @@ color_name = {
     BLACK: "black",
 }
 
+GET_ALL = 2
+
+# Link direction masks.  These are used to
+# store all possible links in a single int16.
+# Each direction corresponds to a single bit.
+NORTH_NE = 2  # x + 1, y + 2
+EAST_NE = 4
+EAST_SE = 8
+SOUTH_SE = 16
+SOUTH_SW = 32
+WEST_SW = 64
+WEST_NW = 128
+NORTH_NW = 256
+
+# OFFSETs are used to calculate the position of a connected
+# peg based on the link direction.
+NORTH_NE_OFFSET = (1, 2)
+EAST_NE_OFFSET = (2, 1)
+EAST_SE_OFFSET = (2, -1)
+SOUTH_SE_OFFSET = (1, -2)
+SOUTH_SW_OFFSET = (-1, -2)
+WEST_SW_OFFSET = (-2, -1)
+WEST_NW_OFFSET = (-2, 1)
+NORTH_NW_OFFSET = (-1, 2)
+
 
 class TwixtBoard:
     """
-    Represents a Twixt board.  Red tries to cross the board top to bottom
-    (y direction) while black tries to cross left to right (x direction).
+    Represents a Twixt board.  Red tries to cross the board top to bottom  (y direction) while black
+    tries to cross left to right (x direction). An optional handicap can be provided which gives the
+    red player an advantage by making the up/down (y direction) size of the board shorter than the
+    width (x direction).
     """
-    GET_ALL = 2
 
-    def __init__(self, size=24, handicap=0):
+    def __init__(self, size=24, handicap=0, state=None):
         """
-        Initialize the board with the given side length (size).  An optional
-        handicap can be provided which gives the red player an advantage by making
-        the up/down (y diretion) size of the board shorter than the width (x direction).
+        Initialize the board with the given side length (size) and handicap, or initialize the board based
+        on the given board state which must be a numpy.ndarray.
         """
-        self.n = size
+        if state is None:
+            self.x = size
+            self.y = size - handicap
+            self.state = np.zeros((self.x, self.y), np.int16)
+        elif isinstance(state, np.ndarray):
+            (self.x, self.y) = state.shape
+            self.handicap = self.x - self.y
+        else:
+            raise Exception(
+                "Invalid type for board state.  Expected `None` or `numpy.ndarray`, got {0}".format(type(state)))
 
-        self.x = size
-        self.y = size - handicap
-        self.board = numpy.zeros((self.x, self.y), numpy.int8)
-
-        # TODO: remove the `pegs` array and replace with the two dimensional `board` array
-        self.pegs = [0] * self.n * self.n
+        # TODO: remove the `links` dictionaries and store the links in the two dimensional `board` array
         self.links_red = dict()
         self.links_black = dict()
 
     # add [][] indexer syntax to the Board
     def __getitem__(self, index):
-        return self.board[index]
+        return self.state[index]
 
-    def get(self, position):
-        """ get the integer value (empty, red, black) at the given (x, y) position """
-        (x, y) = position
-        return self.board[x][y]
+    def get(self, x=0, y=0, offset=(0, 0)):
+        """ Get the board state at the given (x, y) position with an optional offset"""
+        (a, b) = offset
+        return self.state[x + a][y + b]
 
     def get_legal_moves(self, color):
         moves = list()
         for i in range(self.x):
             for j in range(self.y):
-                if self.board[i][j] == 0:
+                if self.state[i][j] == 0:
                     new_move = (i, j)
                     moves.append(new_move)
         return moves
@@ -60,21 +89,21 @@ class TwixtBoard:
     def has_legal_moves(self):
         for i in range(self.x):
             for j in range(self.y):
-                if self.board[i][j] == 0:
+                if self.state[i][j] == 0:
                     return True
         return False
 
     def get_num(self, position):
         if type(position) is tuple:
             (x, y) = position
-            pos = y * self.n + x
+            pos = y * self.x + x
         else:
             pos = position
         return pos
 
     def get_tuple(self, position):
         if type(position) is int:
-            pos = (position % self.n, position // self.n)
+            pos = (position % self.x, position // self.x)
         else:
             pos = position
         return pos
@@ -156,7 +185,7 @@ class TwixtBoard:
             yi = 0
             while - 3 + horiz < yi < 3 - horiz:
                 if (xi != 0 or yi != 0) and (xi + x1 != x2 or yi + y1 != y2):
-                    if self.board[xi + x1][yi + y1] != 0:
+                    if self.state[xi + x1][yi + y1] != 0:
                         if self.get_links(((xi + x1), (y1 + yi))):
                             if (vert * yi + horiz * xi == 0) or (
                                     vert * (yi + y1) + horiz * (xi + x1) == vert * y2 + horiz * x2):
@@ -173,66 +202,72 @@ class TwixtBoard:
             xi = (xi + horiz * xdiff // 2 + vert * xdiff)
         return not blocked
 
-    def check_links(self, position, color):
-        """ position is ALWAYS tuple """
+    def update_links(self, position, color):
+        """
+        Find and create links which are made possible by the new peg at `position`.
+        Position must be an (x, y) tuple.
+        """
 
         (x, y) = position
 
-        # Make sure it isn't along top row (0th row)
+        # Make sure it isn't along the bottom row (0th row)
         if y > 0:
             # check (-2,-1)
-            if x > 1 and self.board[x - 2][y - 1] == color:
+            if x > 1 and (color * self.get(x, y, WEST_NW_OFFSET)) > 0:
                 log(DEBUG, "connection W by NW")
                 self.connect_link(position, (x - 2, y - 1), color)
 
             # check (+2,-1)
-            if x < self.x - 2 and self.board[x + 2][y - 1] == color:
+            if x < self.x - 2 and (color * self.get(x, y, EAST_NE_OFFSET)) > 0:
                 log(DEBUG, "connection E by NE")
                 self.connect_link(position, (x + 2, y - 1), color)
 
             # Make sure it isn't along top 2 rows (0th, 1st row)
             if y > 1:
                 # check (-1,-2)
-                if x > 0 and self.board[x - 1][y - 2] == color:
+                if x > 0 and self.state[x - 1][y - 2] == color:
                     log(DEBUG, "connection N by NW")
                     self.connect_link(position, (x - 1, y - 2), color)
 
                 # check (+1,-2)
-                if x < self.x - 1 and self.board[x + 1][y - 2] == color:
+                if x < self.x - 1 and self.state[x + 1][y - 2] == color:
                     log(DEBUG, "connection N by NE")
                     self.connect_link(position, (x + 1, y - 2), color)
 
-        # Make sure it isn't along bottom row
+        # Make sure it isn't along top row
         if y < self.y - 1:
             # check (+2,+1)
-            if x < self.x - 2 and self.board[x + 2][y + 1] == color:
+            if x < self.x - 2 and self.state[x + 2][y + 1] == color:
                 log(DEBUG, "connection E by SE")
                 self.connect_link(position, (x + 2, y + 1), color)
 
             # check (-2,+1)
-            if x > 1 and self.board[x - 2][y + 1] == color:
+            if x > 1 and self.state[x - 2][y + 1] == color:
                 log(DEBUG, "connection W by SW")
                 self.connect_link(position, (x - 2, y + 1), color)
 
             if y < self.y - 2:
 
                 # check (+1,+2)
-                if x < self.x - 1 and self.board[x + 1][y + 2] == color:
+                if x < self.x - 1 and self.state[x + 1][y + 2] == color:
                     log(DEBUG, "connection S by SE")
                     self.connect_link(position, (x + 1, y + 2), color)
 
                 # check (-1,+2)
-                if x > 0 and self.board[x - 1][y + 2] == color:
+                if x > 0 and self.state[x - 1][y + 2] == color:
                     log(DEBUG, "connection S by SW")
                     self.connect_link(position, (x - 1, y + 2), color)
 
         return len(self.links_red), len(self.links_black)
 
     def is_win(self, color):
+        # TODO: needs to be implemented, remove temporary testing logic
+        if self.state[0][0] != 0:
+            return True
         return False
 
     def execute_move(self, move, color):
         (x, y) = move
-        assert self.board[x][y] == 0
-        self.board[x][y] = color
-        self.check_links(move, color)
+        assert self.state[x][y] == 0
+        self.state[x][y] = color
+        self.update_links(move, color)

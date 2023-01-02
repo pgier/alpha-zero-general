@@ -20,7 +20,7 @@ class TwixtGame(Game):
 
     def getInitBoard(self):
         b = TwixtBoard(self.size, self.handicap)
-        return b.board
+        return b.state
 
     def getBoardSize(self):
         return self.x, self.y
@@ -32,15 +32,15 @@ class TwixtGame(Game):
     def getNextState(self, board, player, action):
         # TODO: why can't we just store a TwixtBoard in the object state instead of re-creating it every turn?
         b = TwixtBoard(self.size, self.handicap)
-        b.board = np.copy(board)
+        b.state = np.copy(board)
         move = (action % self.x, action // self.y)
         b.execute_move(move, player)
-        return b.board, -player
+        return b.state, -player
 
     def getValidMoves(self, board, player):
         valid_moves = [0] * self.getActionSize()
         b = TwixtBoard(self.size, self.handicap)
-        b.board = np.copy(board)
+        b.state = np.copy(board)
         legal_moves = b.get_legal_moves(player)
         if len(legal_moves) == 0:
             valid_moves[-1] = 1
@@ -51,7 +51,7 @@ class TwixtGame(Game):
 
     def getGameEnded(self, board, player):
         b = TwixtBoard(self.size, self.handicap)
-        b.board = np.copy(board)
+        b.state = np.copy(board)
 
         if b.is_win(player):
             return 1

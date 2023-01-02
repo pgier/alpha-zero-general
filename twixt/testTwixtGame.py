@@ -28,7 +28,7 @@ class TestTwixtGame(unittest.TestCase):
         move2 = (4, 0)
         board.execute_move(move2, BLACK)
         board.execute_move(move1, RED)
-        TwixtGame.display(board.board)
+        TwixtGame.display(board.state)
 
 
 if __name__ == '__main__':
