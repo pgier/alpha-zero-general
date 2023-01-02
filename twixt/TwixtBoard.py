@@ -288,11 +288,10 @@ class TwixtBoard:
                 (x, y) = stack[len(stack)-1]
                 if y == self.y - 1:
                     return win
-                for j in get_bits(self.state[x][y]):
-                    if j != 1:
-                        (a, b) = LINK_OFFSET_DICT[j]
-                        if (x+a, y+b) not in seen:
-                            stack.append((x+a, y+b))
+                links = self.get_links((x, y))
+                for (a, b) in links:
+                    if (a, b) not in seen:
+                        stack.append((a, b))
                 stack.remove((x, y))
                 seen.append((x, y))
         if color == BLACK:
@@ -300,14 +299,13 @@ class TwixtBoard:
                 if self.state[0][i] != 0:
                     stack.append((0, i))
             while len(stack) > 0:
-                (x, y) = stack[len(stack)-1]
-                if x == self.x - 1:
+                (x, y) = stack[len(stack) - 1]
+                if y == self.y - 1:
                     return win
-                for j in get_bits(self.state[x][y]):
-                    if j != 1:
-                        (a, b) = LINK_OFFSET_DICT[j]
-                        if (x+a, y+b) not in seen:
-                            stack.append((x+a, y+b))
+                links = self.get_links((x, y))
+                for (a, b) in links:
+                    if (a, b) not in seen:
+                        stack.append((a, b))
                 stack.remove((x, y))
                 seen.append((x, y))
         return not win

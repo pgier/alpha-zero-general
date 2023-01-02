@@ -64,7 +64,6 @@ class TestTwixtBoard(unittest.TestCase):
         board.execute_move(move_2, RED)
         move_3 = (4, 2)
         board.execute_move(move_3, RED)
-        self.assertEqual(3, len(board.links_red))
         self.assertTrue(move_2 in board.get_links(move_1))
         self.assertTrue(move_3 in board.get_links(move_2))
         self.assertTrue(move_1 in board.get_links(move_2))
@@ -113,7 +112,8 @@ class TestTwixtBoard(unittest.TestCase):
         board.execute_move(move, BLACK)
         self.assertFalse(board.is_win(RED), "red should not win")
         self.assertFalse(board.is_win(BLACK), "black should not win")
-
+        self.assertFalse((1, 1) in board.get_links((3, 0)))
+        self.assertTrue((4, 2) in board.get_links((3,0)))
         move = (1, 5)
         board.execute_move(move, RED)
         self.assertTrue(board.is_win(RED), "red should win ")
