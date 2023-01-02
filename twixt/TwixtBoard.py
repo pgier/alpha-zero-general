@@ -272,17 +272,17 @@ class TwixtBoard:
                 log(DEBUG, "connection W by SW")
                 self.connect_link(x, y, WEST_SW)
 
-            if x < self.x - 2 and (color * self.get(x, y, EAST_SE_OFFSET) == color):
+            if x < self.x - 2 and (get_color(self.get(x, y, EAST_SE_OFFSET)) == color):
                 log(DEBUG, "connection E by SE")
                 self.connect_link(x, y, EAST_SE)
 
             # Make sure it isn't along bottom 2 rows (0th, 1st row)
             if y > 1:
-                if x > 0 and (color * self.get(x, y, SOUTH_SW_OFFSET) == color):
+                if x > 0 and (get_color(self.get(x, y, SOUTH_SW_OFFSET)) == color):
                     log(DEBUG, "connection S by SW")
                     self.connect_link(x, y, SOUTH_SW)
 
-                if x < self.x - 1 and (color * self.get(x, y, SOUTH_SE_OFFSET) == color):
+                if x < self.x - 1 and (get_color(color * self.get(x, y, SOUTH_SE_OFFSET)) == color):
                     log(DEBUG, "connection S by SE")
                     self.connect_link(x, y, SOUTH_SE)
 

@@ -111,7 +111,6 @@ class TestTwixtBoard(unittest.TestCase):
         board.execute_move(move, RED)
         move = (2, 4)
         board.execute_move(move, BLACK)
-        print(board.get(3, 0))
         self.assertFalse(board.is_win(RED), "red should not win")
         self.assertFalse(board.is_win(BLACK), "black should not win")
 
