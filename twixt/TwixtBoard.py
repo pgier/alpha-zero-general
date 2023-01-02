@@ -55,8 +55,6 @@ class TwixtBoard:
                 if self.board[i][j] == 0:
                     new_move = (i, j)
                     moves.append(new_move)
-        print(moves)
-
         return moves
 
     def has_legal_moves(self):

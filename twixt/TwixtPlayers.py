@@ -1,8 +1,8 @@
-import numpy as np
-
 """
 Random and Human-interacting players for the game of Twixt.
 """
+import numpy as np
+import sys
 
 
 class RandomPlayer:
@@ -22,21 +22,33 @@ class HumanPlayer:
         self.game = game
 
     def play(self, board):
-        # display(board)
-        valid = self.game.getValidMoves(board, 1)
-        for i in range(len(valid)):
-            if valid[i]:
-                print(int(i / self.game.size), int(i % self.game.size))
+        valid_moves = self.game.getValidMoves(board, 1)
+        (board_x, board_y) = board.shape
+        # for i in range(len(valid)):
+        #     if valid[i]:
+        #         print(int(i / self.game.size), int(i % self.game.size))
         while True:
-            user_input = input()
-            # Python 2.x
-            # a = raw_input()
+            try:
+                raw_in = input()
+            except EOFError:
+                HumanPlayer.done()
 
-            x, y = [int(x) for x in user_input.split(' ')]
-            a = self.game.size * x + y if x != -1 else self.game.size ** 2
-            if valid[a]:
-                break
+            trimmed_input = raw_in.strip()
+            if trimmed_input == "q" or trimmed_input == "quit":
+                HumanPlayer.done()
+
+            split_input = trimmed_input.split(' ')
+            if len(split_input) != 2:
+                print("Invalid input, enter position `x y` or `q` to quit")
+                continue
+            x, y = [int(x) for x in split_input]
+            selected_move = board_x * y + x if x != -1 else board_x * board_y
+            if valid_moves[selected_move]:
+                return selected_move
             else:
-                print('Invalid')
+                print("Invalid move, this position is already taken")
 
-        return a
+    @staticmethod
+    def done():
+        print("Bye")
+        sys.exit()

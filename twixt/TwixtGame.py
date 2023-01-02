@@ -86,7 +86,7 @@ class TwixtGame(Game):
 
     @staticmethod
     def display(board):
-        print("here is the board")
+        print("\nTwixT")
         bx, by = board.shape
         # by = board.y
         vx = 0
@@ -110,3 +110,4 @@ class TwixtGame(Game):
         for n in range(bx):
             print(vx, end="  ")
             vx += 1
+        print()
