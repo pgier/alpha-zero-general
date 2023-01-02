@@ -295,10 +295,10 @@ class TwixtBoard:
                 self.connect_link(x, y, WEST_NW)
 
             if y < self.y - 2:
-                if x < self.x - 1 and (get_color(self.get(x, y, NORTH_NW_OFFSET)) == color):
+                if x > 0 and (get_color(self.get(x, y, NORTH_NW_OFFSET)) == color):
                     log(DEBUG, "connection N by NW")
                     self.connect_link(x, y, NORTH_NW)
-                if x > 0 and (get_color(self.get(x, y, NORTH_NE_OFFSET)) == color):
+                if x < self.x - 1 and (get_color(self.get(x, y, NORTH_NE_OFFSET)) == color):
                     log(DEBUG, "connection N by NE")
                     self.connect_link(x, y, NORTH_NE)
 
