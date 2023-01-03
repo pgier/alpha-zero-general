@@ -4,14 +4,16 @@ Random and Human-interacting players for the game of Twixt.
 import numpy as np
 import sys
 
+from twixt.TwixtBoard import RED
 
 class RandomPlayer:
-    def __init__(self, game):
+    def __init__(self, game, color=RED):
         self.game = game
+        self.color = color
 
     def play(self, board):
         a = np.random.randint(self.game.getActionSize())
-        valid_moves = self.game.getValidMoves(board, 1)
+        valid_moves = self.game.getValidMoves(board, self.color)
         while valid_moves[a] != 1:
             a = np.random.randint(self.game.getActionSize())
         (board_x, _) = board.shape
@@ -21,11 +23,12 @@ class RandomPlayer:
 
 
 class HumanPlayer:
-    def __init__(self, game):
+    def __init__(self, game, color=RED):
         self.game = game
+        self.color = color
 
     def play(self, board):
-        valid_moves = self.game.getValidMoves(board, 1)
+        valid_moves = self.game.getValidMoves(board, self.color)
         (board_x, board_y) = board.shape
         # for i in range(len(valid)):
         #     if valid[i]:

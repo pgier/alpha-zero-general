@@ -9,6 +9,8 @@ sys.path.append(parent)
 from MCTS import MCTS
 from twixt.TwixtGame import TwixtGame
 from twixt.TwixtPlayers import *
+from twixt.TwixtBoard import RED
+from twixt.TwixtBoard import BLACK
 
 
 import Arena
@@ -25,7 +27,7 @@ any agent.
 def main():
     g = TwixtGame(6)
     random_player = RandomPlayer(g).play
-    human_player = HumanPlayer(g).play
+    human_player = HumanPlayer(g, BLACK).play
 
     # n1 = NNet(g)
     # n1.load_checkpoint('./temp/ttt_checkpoint', 'temp.h5')
