@@ -52,7 +52,7 @@ class HumanPlayer:
             if valid_moves[selected_move]:
                 return selected_move
             else:
-                print("Invalid move, this position is already taken")
+                print("Invalid move, please try again")
 
     @staticmethod
     def done():

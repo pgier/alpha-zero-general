@@ -5,7 +5,6 @@ import numpy as np
 from logging import *
 from twixt.TwixtUtil import *
 
-
 EMPTY = 0
 RED = 1
 BLACK = -1
@@ -18,9 +17,10 @@ color_name = {
 
 GET_ALL = 2
 
-# Link direction masks.  These are used to
-# store all possible links in a single int16.
-# Each direction corresponds to a single bit.
+# Link direction masks.  These are used to store all possible
+# combinations in a single int.  Each direction corresponds to a
+# single bit.  We don't use the first bit because that is used
+# to determine if the space is EMPTY.
 NORTH_NE = 2  # x + 1, y + 2
 EAST_NE = 4
 EAST_SE = 8
@@ -64,9 +64,6 @@ LINK_REVERSE_DICT = {
     WEST_NW: EAST_SE,
     NORTH_NW: SOUTH_SE,
 }
-
-# Alias the `sign` function to the name get_color for easy readability
-get_color = sign
 
 
 class TwixtBoard:
@@ -229,6 +226,16 @@ class TwixtBoard:
             xi = (xi + horiz * xdiff // 2 + vert * xdiff)
         return not blocked
 
+    def get_color(self, x, y, offset=(0, 0)):
+        """ Return the color at the specified position with optional offset """
+        (a, b) = offset
+        v = self.state[(x + a), (y + b)]
+        if v == 0:
+            return EMPTY
+        if v > 0:
+            return RED
+        return BLACK
+
     def update_links(self, position):
         """
         Find and create links which are made possible by the new peg at `position`.
@@ -236,43 +243,43 @@ class TwixtBoard:
         """
 
         (x, y) = position
-        color = get_color(self.state[x][y])
+        color = self.get_color(x, y)
 
-        # Make sure it isn't along the bottom row (0th row)
+        # Only check for southern links when the peg is not along the bottom row.
         if y > 0:
-            if x > 1 and (get_color(self.get(x, y, WEST_SW_OFFSET)) == color):
+            if x > 1 and color == self.get_color(x, y, WEST_SW_OFFSET):
                 log(DEBUG, "connection W by SW")
                 self.connect_link(x, y, WEST_SW)
 
-            if x < self.x - 2 and (get_color(self.get(x, y, EAST_SE_OFFSET)) == color):
+            if x < (self.x - 2) and color == self.get_color(x, y, EAST_SE_OFFSET):
                 log(DEBUG, "connection E by SE")
                 self.connect_link(x, y, EAST_SE)
 
             # Make sure it isn't along bottom 2 rows (0th, 1st row)
             if y > 1:
-                if x > 0 and (get_color(self.get(x, y, SOUTH_SW_OFFSET)) == color):
+                if x > 0 and color == self.get_color(x, y, SOUTH_SW_OFFSET):
                     log(DEBUG, "connection S by SW")
                     self.connect_link(x, y, SOUTH_SW)
 
-                if x < self.x - 1 and (get_color(self.get(x, y, SOUTH_SE_OFFSET)) == color):
+                if x < (self.x - 1) and color == self.get_color(x, y, SOUTH_SE_OFFSET):
                     log(DEBUG, "connection S by SE")
                     self.connect_link(x, y, SOUTH_SE)
 
-        # Make sure it isn't along the top row
+        # Only check for northern links when the peg is not along the top row.
         if y < self.y - 1:
-            if x < self.x - 2 and (get_color(self.get(x, y, EAST_NE_OFFSET)) == color):
+            if x < (self.x - 2) and color == self.get_color(x, y, EAST_NE_OFFSET):
                 log(DEBUG, "connection E by NE")
                 self.connect_link(x, y, EAST_NE)
 
-            if x > 1 and (get_color(self.get(x, y, WEST_NW_OFFSET)) == color):
-                log(DEBUG, "connection W by NW")
+            if x > 1 and color == self.get_color(x, y, WEST_NW_OFFSET):
+                log(DEBUG, "connectioget_colorn W by NW")
                 self.connect_link(x, y, WEST_NW)
 
-            if y < self.y - 2:
-                if x > 0 and (get_color(self.get(x, y, NORTH_NW_OFFSET)) == color):
+            if y < (self.y - 2):
+                if x > 0 and color == self.get_color(x, y, NORTH_NW_OFFSET):
                     log(DEBUG, "connection N by NW")
                     self.connect_link(x, y, NORTH_NW)
-                if x < self.x - 1 and (get_color(self.get(x, y, NORTH_NE_OFFSET)) == color):
+                if x < (self.x - 1) and color == self.get_color(x, y, NORTH_NE_OFFSET):
                     log(DEBUG, "connection N by NE")
                     self.connect_link(x, y, NORTH_NE)
 
@@ -281,11 +288,11 @@ class TwixtBoard:
         stack = list()
         win = True
         if color == RED:
-            for i in range(self.x-1):
+            for i in range(self.x - 1):
                 if self.state[i][0] != 0:
                     stack.append((i, 0))
         if color == BLACK:
-            for i in range(self.y-1):
+            for i in range(self.y - 1):
                 if self.state[0][i] != 0:
                     stack.append((0, i))
         while len(stack) > 0:
